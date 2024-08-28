@@ -26,24 +26,21 @@ function addFilesToZip($zip, $dir, $zipdir = '') {
                     $content = file_get_contents($file);
                     $zip_content_start = ftell($zip);
 
-                    // Local file header
                     fwrite($zip, "\x50\x4b\x03\x04");
-                    fwrite($zip, pack('v', 10)); // Version needed to extract
-                    fwrite($zip, pack('v', 0)); // General purpose bit flag
-                    fwrite($zip, pack('v', 0)); // Compression method
-                    fwrite($zip, pack('v', 0)); // Last mod file time
-                    fwrite($zip, pack('v', 0)); // Last mod file date
-                    fwrite($zip, pack('V', crc32($content))); // CRC32
-                    fwrite($zip, pack('V', strlen($content))); // Compressed size
-                    fwrite($zip, pack('V', strlen($content))); // Uncompressed size
-                    fwrite($zip, pack('v', strlen($zipfile))); // File name length
-                    fwrite($zip, pack('v', 0)); // Extra field length
-                    fwrite($zip, $zipfile); // File name
-                    
-                    // File data
+                    fwrite($zip, pack('v', 10)); 
+                    fwrite($zip, pack('v', 0)); 
+                    fwrite($zip, pack('v', 0)); 
+                    fwrite($zip, pack('v', 0)); 
+                    fwrite($zip, pack('v', 0)); 
+                    fwrite($zip, pack('V', crc32($content))); 
+                    fwrite($zip, pack('V', strlen($content))); 
+                    fwrite($zip, pack('V', strlen($content))); 
+                    fwrite($zip, pack('v', strlen($zipfile))); 
+                    fwrite($zip, pack('v', 0)); 
+                    fwrite($zip, $zipfile); 
+                 
                     fwrite($zip, $content);
 
-                    // Data descriptor
                     fwrite($zip, pack('V', crc32($content)));
                     fwrite($zip, pack('V', strlen($content)));
                     fwrite($zip, pack('V', strlen($content)));
@@ -69,22 +66,22 @@ if ($handle = opendir($carpetaRuta)) {
             if (!is_dir($file)) {
                 $content = file_get_contents($file);
                 $central_dir .= "\x50\x4b\x01\x02";
-                $central_dir .= pack('v', 10); // Version made by
-                $central_dir .= pack('v', 10); // Version needed to extract
-                $central_dir .= pack('v', 0); // General purpose bit flag
-                $central_dir .= pack('v', 0); // Compression method
-                $central_dir .= pack('v', 0); // Last mod file time
-                $central_dir .= pack('v', 0); // Last mod file date
-                $central_dir .= pack('V', crc32($content)); // CRC32
-                $central_dir .= pack('V', strlen($content)); // Compressed size
-                $central_dir .= pack('V', strlen($content)); // Uncompressed size
-                $central_dir .= pack('v', strlen($entry)); // File name length
-                $central_dir .= pack('v', 0); // Extra field length
-                $central_dir .= pack('v', 0); // File comment length
-                $central_dir .= pack('v', 0); // Disk number start
-                $central_dir .= pack('v', 0); // Internal file attributes
-                $central_dir .= pack('V', 32); // External file attributes
-                $central_dir .= pack('V', 0); // Relative offset of local header
+                $central_dir .= pack('v', 10); 
+                $central_dir .= pack('v', 10); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('V', crc32($content)); 
+                $central_dir .= pack('V', strlen($content)); 
+                $central_dir .= pack('V', strlen($content)); 
+                $central_dir .= pack('v', strlen($entry)); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('v', 0); 
+                $central_dir .= pack('V', 32); 
+                $central_dir .= pack('V', 0); 
                 $central_dir .= $entry;
                 $entries++;
             }
@@ -95,15 +92,14 @@ if ($handle = opendir($carpetaRuta)) {
 
 fwrite($zip, $central_dir);
 
-// End of central directory record
 fwrite($zip, "\x50\x4b\x05\x06");
-fwrite($zip, pack('v', 0)); // Number of this disk
-fwrite($zip, pack('v', 0)); // Disk where central directory starts
-fwrite($zip, pack('v', $entries)); // Number of central directory records on this disk
-fwrite($zip, pack('v', $entries)); // Total number of central directory records
-fwrite($zip, pack('V', strlen($central_dir))); // Size of central directory
-fwrite($zip, pack('V', $central_dir_start)); // Offset of start of central directory, relative to start of archive
-fwrite($zip, pack('v', 0)); // Comment length
+fwrite($zip, pack('v', 0)); 
+fwrite($zip, pack('v', 0)); 
+fwrite($zip, pack('v', $entries)); 
+fwrite($zip, pack('v', $entries)); 
+fwrite($zip, pack('V', strlen($central_dir))); 
+fwrite($zip, pack('V', $central_dir_start));
+fwrite($zip, pack('v', 0)); 
 
 fclose($zip);
 
