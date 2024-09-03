@@ -22,13 +22,13 @@ if (!carpetaNombre) {
     function crearCarpeta(carpetaNombre) {
     $.ajax({
         url: 'crearCarpeta.php', // Ruta del archivo PHP que crea la carpeta
-        type: 'POST', // Puedes usar POST o GET según tus necesidades
+        type: 'POST', 
         data: { nombreCarpeta: carpetaNombre }, // Envía el nombre de la carpeta como datos
         success: function(response) {
-            console.log('Carpeta creada.'); // Mensaje de éxito (puedes personalizarlo)
+            console.log('Carpeta creada.'); // Mensaje de éxito 
         },
         error: function() {
-            console.log('Error al crear la carpeta.'); // Mensaje de error (puedes personalizarlo)
+            console.log('Error al crear la carpeta.'); // Mensaje de error 
         }
     });
 }
@@ -75,9 +75,6 @@ function handleFile(file) {
     if (file) {
         // Realiza alguna acción, como mostrar el nombre del archivo
         console.log('Archivo seleccionado:', file.name);
-
-        // También puedes realizar otras acciones, como subir el archivo al servidor
-        // Puedes agregar aquí el código para subir el archivo si lo deseas
     }
 }
 
@@ -156,15 +153,12 @@ function uploadFile(file) {
 
 // Función para actualizar la barra de progreso
 function updateProgress(fileName, percent) {
-    // Aquí puedes implementar la lógica para mostrar el progreso de cada archivo
     console.log(`${fileName}: ${percent.toFixed(2)}% subido`);
 }
 
 // Función para actualizar la lista de archivos después de la subida
 function updateFileList() {
-    // Aquí puedes implementar la lógica para actualizar la lista de archivos
-    // Por ejemplo, hacer una petición AJAX para obtener la lista actualizada
-    location.reload(); // Por ahora, simplemente recargamos la página
+    location.reload(); 
 }
 
 // Prevenir el envío del formulario por defecto

@@ -31,4 +31,3 @@ deleteFiles($carpetaRuta);
 mkdir($carpetaRuta, 0755, true);
 
 echo json_encode(['success' => true, 'message' => "Todos los archivos han sido eliminados."]);
-?>

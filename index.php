@@ -50,6 +50,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compartir archivos</title>
     <link rel="stylesheet" href="estilo.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 
 <body>
@@ -129,6 +130,16 @@ try {
     <script src="parametro.js"></script>
 
     <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function (registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function (err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
         document.getElementById('archivo').addEventListener('change', function (e) {
             var file = e.target.files[0];
             uploadFile(file);
@@ -152,7 +163,6 @@ try {
             xhr.onload = function () {
                 if (xhr.status === 200) {
                     document.getElementById('progress-status').textContent = 'Archivo subido con éxito';
-                    // Aquí puedes agregar código para actualizar la lista de archivos
                     location.reload(); // Recarga la página para mostrar el nuevo archivo
                 } else {
                     document.getElementById('progress-status').textContent = 'Error al subir el archivo';

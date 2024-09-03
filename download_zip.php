@@ -111,4 +111,3 @@ readfile($temp_file);
 
 // Elimina el archivo temporal
 unlink($temp_file);
-?>
