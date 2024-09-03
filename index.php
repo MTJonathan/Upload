@@ -49,7 +49,6 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compartir archivos</title>
-    <script src="parametro.js"></script>
     <link rel="stylesheet" href="estilo.css">
 </head>
 
@@ -117,6 +116,9 @@ try {
             </div>
         </div>
     </div>
+
+
+    <script src="parametro.js"></script>
 
     <script>
     document.getElementById('archivo').addEventListener('change', function(e) {

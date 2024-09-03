@@ -47,38 +47,6 @@ function generarCadenaAleatoria() {
 }
 
 
-// //BARRA DE PROGRESO 
-// function uploadFile(carpetaRuta, inputId) {
-//   var archivoInput = document.getElementById(inputId);
-//   var archivo = archivoInput.files[0];
-//   var progressBar = document.getElementById('progressBar');
-
-//   var formData = new FormData();
-//   formData.append('archivo', archivo);
-
-//   var xhr = new XMLHttpRequest();
-
-//   xhr.upload.onprogress = function (event) {
-//       if (event.lengthComputable) {
-//           var percentComplete = (event.loaded / event.total) * 100;
-//           progressBar.value = percentComplete;
-//       }
-//   };
-
-//   xhr.onload = function () {
-//       if (xhr.status === 200) {
-//           console.log('Archivo subido con éxito');
-//           // Puedes realizar acciones adicionales después de la carga aquí
-//       } else {
-//           console.error('Error al subir el archivo');
-//       }
-//   };
-
-//   xhr.open('POST', 'upload.php', true);
-//   xhr.send(formData);
-// }
-
-
 //DROP AREA
 
 // Obtén la zona de arrastre y el formulario
@@ -126,4 +94,81 @@ Form.addEventListener('submit', (e) => {
     }
 });
 
-//progres bar 
+// Obtén la zona de arrastre y el formulario
+const form = document.getElementById('form');
+const fileInput = document.getElementById('archivo');
+
+// Eventos para la zona de arrastre
+dropArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropArea.classList.add('drag-over');
+});
+
+dropArea.addEventListener('dragleave', () => {
+    dropArea.classList.remove('drag-over');
+});
+
+dropArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropArea.classList.remove('drag-over');
+    handleFiles(e.dataTransfer.files);
+});
+
+// Manejar la selección de archivos mediante el input
+fileInput.addEventListener('change', (e) => {
+    handleFiles(e.target.files);
+});
+
+// Función para manejar múltiples archivos
+function handleFiles(files) {
+    for (let i = 0; i < files.length; i++) {
+        uploadFile(files[i]);
+    }
+}
+
+// Función para subir un archivo
+function uploadFile(file) {
+    const xhr = new XMLHttpRequest();
+    const formData = new FormData();
+
+    formData.append('archivo', file);
+
+    xhr.open('POST', 'subir.php?nombre=<?php echo $carpetaNombre; ?>', true);
+
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            updateProgress(file.name, percentComplete);
+        }
+    };
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            console.log(`${file.name} subido con éxito`);
+            updateFileList();
+        } else {
+            console.error(`Error al subir ${file.name}`);
+        }
+    };
+
+    xhr.send(formData);
+}
+
+// Función para actualizar la barra de progreso
+function updateProgress(fileName, percent) {
+    // Aquí puedes implementar la lógica para mostrar el progreso de cada archivo
+    console.log(`${fileName}: ${percent.toFixed(2)}% subido`);
+}
+
+// Función para actualizar la lista de archivos después de la subida
+function updateFileList() {
+    // Aquí puedes implementar la lógica para actualizar la lista de archivos
+    // Por ejemplo, hacer una petición AJAX para obtener la lista actualizada
+    location.reload(); // Por ahora, simplemente recargamos la página
+}
+
+// Prevenir el envío del formulario por defecto
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    handleFiles(fileInput.files);
+});
