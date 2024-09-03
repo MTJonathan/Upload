@@ -216,3 +216,75 @@ button.btn_delete svg {
 .clean-all-btn:hover {
   background-color: #7a0505;
 }
+
+@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+* {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  box-sizing: border-box;
+}
+/* ... (resto del CSS existente) ... */
+
+.drop-area {
+  width: 435px;
+  text-align: center;
+  flex: 1;
+  margin: 10px;
+  border: 2px dashed #0730c5;
+  box-sizing: border-box;
+  border-radius: 15px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  background-image: url('path_to_your_default_image.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 64px;
+}
+
+.drop-area:hover {
+  scale: 0.995;
+  opacity: 0.8;
+}
+
+.drop-area.drag-over {
+  background-color: #e6ecff;
+  border-color: #051e7a;
+  background-image: url('path_to_your_drag_over_image.svg');
+}
+
+.drop-text {
+  font-size: 18px;
+  color: #0730c5;
+  margin-top: 10px;
+}
+
+.drag-over .drop-text {
+  color: #051e7a;
+}
+
+.drag-over .default-text {
+  display: none;
+}
+
+.drag-over .drag-text {
+  display: block;
+}
+
+.drop-area.drag-over svg {
+  fill: #ff0000 !important; /* Cambia el color del ícono SVG a rojo */
+}
+
+.drag-over .drop-text {
+  color: #ff0000; /* Texto rojo cuando se arrastra */
+}
+
+.drop-area.drag-over {
+  background-color: #ffe6e6; /* Fondo rojo claro */
+  border-color: #ff3333; /* Borde rojo más intenso */
+  box-shadow: 0 0 10px rgba(255, 51, 51, 0.5); /* Sombra roja suave */
+}

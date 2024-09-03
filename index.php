@@ -55,15 +55,23 @@ try {
 <body>
     <h1>Compartir archivos <sup class="beta">BETA</sup></h1>
     <div class="content">
-        <h3>Sube tus archivos y comparte este enlace temporal: <span>ibu.pe/?nombre=<?php echo $carpetaNombre;?></span></h3>
+        <h3>Sube tus archivos y comparte este enlace temporal: <span>ibu.pe/?nombre=<?php echo $carpetaNombre; ?></span>
+        </h3>
         <div class="container">
             <div class="drop-area" id="drop-area">
                 <form action="" id="form" method="POST" enctype="multipart/form-data">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" style="fill:#0730c5;transform: ;msFilter:;"><path d="M13 19v-4h3l-4-5-4 5h3v4z"></path><path d="M7 19h2v-2H7c-1.654 0-3-1.346-3-3 0-1.404 1.199-2.756 2.673-3.015l.581-.102.192-.558C8.149 8.274 9.895 7 12 7c2.757 0 5 2.243 5 5v1h1c1.103 0 2 .897 2 2s-.897 2-2 2h-3v2h3c2.206 0 4-1.794 4-4a4.01 4.01 0 0 0-3.056-3.888C18.507 7.67 15.56 5 12 5 9.244 5 6.85 6.611 5.757 9.15 3.609 9.792 2 11.82 2 14c0 2.757 2.243 5 5 5z"></path></svg> <br>
-                    <input type="file" class="file-input" name="archivo" id="archivo" onchange="document.getElementById('form').submit()" multiple>
-                    <label> Arrastra tus archivos aquí<br>o</label>
-                    <p><b>Abre el explorador</b></p> 
-                    
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24"
+                        style="fill:#0730c5;transform: ;msFilter:;">
+                        <path d="M13 19v-4h3l-4-5-4 5h3v4z"></path>
+                        <path
+                            d="M7 19h2v-2H7c-1.654 0-3-1.346-3-3 0-1.404 1.199-2.756 2.673-3.015l.581-.102.192-.558C8.149 8.274 9.895 7 12 7c2.757 0 5 2.243 5 5v1h1c1.103 0 2 .897 2 2s-.897 2-2 2h-3v2h3c2.206 0 4-1.794 4-4a4.01 4.01 0 0 0-3.056-3.888C18.507 7.67 15.56 5 12 5 9.244 5 6.85 6.611 5.757 9.15 3.609 9.792 2 11.82 2 14c0 2.757 2.243 5 5 5z">
+                        </path>
+                    </svg> <br>
+                    <input type="file" class="file-input" name="archivo" id="archivo"
+                        onchange="document.getElementById('form').submit()" multiple>
+                    <p class="drop-text default-text">Arrastra tus archivos aquí<br>o<br><b>Abre el explorador</b></p>
+                    <p class="drop-text drag-text" style="display: none;"><b>Suelta tu archivo</b></p>
+
                 </form>
                 <div id="progress-container" style="display: none; width: 100%; margin-top: 20px;">
                     <progress id="progress-bar" value="0" max="100" style="width: 100%;"></progress>
@@ -72,7 +80,7 @@ try {
             </div>
 
             <div class="container2">
-               
+
 
                 <div id="file-list" class="pila">
                     <?php
@@ -121,59 +129,59 @@ try {
     <script src="parametro.js"></script>
 
     <script>
-    document.getElementById('archivo').addEventListener('change', function(e) {
-        var file = e.target.files[0];
-        uploadFile(file);
-    });
+        document.getElementById('archivo').addEventListener('change', function (e) {
+            var file = e.target.files[0];
+            uploadFile(file);
+        });
 
-    function uploadFile(file) {
-        var xhr = new XMLHttpRequest();
-        var formData = new FormData();
-        formData.append('archivo', file);
+        function uploadFile(file) {
+            var xhr = new XMLHttpRequest();
+            var formData = new FormData();
+            formData.append('archivo', file);
 
-        xhr.open('POST', 'subir.php?nombre=<?php echo $carpetaNombre; ?>', true);
+            xhr.open('POST', 'subir.php?nombre=<?php echo $carpetaNombre; ?>', true);
 
-        xhr.upload.onprogress = function(e) {
-            if (e.lengthComputable) {
-                var percentComplete = (e.loaded / e.total) * 100;
-                document.getElementById('progress-bar').value = percentComplete;
-                document.getElementById('progress-status').textContent = Math.round(percentComplete) + '% subido';
-            }
-        };
-
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                document.getElementById('progress-status').textContent = 'Archivo subido con éxito';
-                // Aquí puedes agregar código para actualizar la lista de archivos
-                location.reload(); // Recarga la página para mostrar el nuevo archivo
-            } else {
-                document.getElementById('progress-status').textContent = 'Error al subir el archivo';
-            }
-        };
-
-        document.getElementById('progress-container').style.display = 'block';
-        xhr.send(formData);
-    }
-    function cleanAllFiles() {
-        if (confirm('¿Estás seguro de que quieres eliminar todos los archivos?')) {
-            fetch('clean_files.php?nombre=<?php echo $carpetaNombre; ?>', {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    location.reload(); // Recarga la página para actualizar la lista de archivos
-                } else {
-                    alert('Error: ' + data.message);
+            xhr.upload.onprogress = function (e) {
+                if (e.lengthComputable) {
+                    var percentComplete = (e.loaded / e.total) * 100;
+                    document.getElementById('progress-bar').value = percentComplete;
+                    document.getElementById('progress-status').textContent = Math.round(percentComplete) + '% subido';
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Ocurrió un error al intentar limpiar los archivos.');
-            });
+            };
+
+            xhr.onload = function () {
+                if (xhr.status === 200) {
+                    document.getElementById('progress-status').textContent = 'Archivo subido con éxito';
+                    // Aquí puedes agregar código para actualizar la lista de archivos
+                    location.reload(); // Recarga la página para mostrar el nuevo archivo
+                } else {
+                    document.getElementById('progress-status').textContent = 'Error al subir el archivo';
+                }
+            };
+
+            document.getElementById('progress-container').style.display = 'block';
+            xhr.send(formData);
         }
-    }
+        function cleanAllFiles() {
+            if (confirm('¿Estás seguro de que quieres eliminar todos los archivos?')) {
+                fetch('clean_files.php?nombre=<?php echo $carpetaNombre; ?>', {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            location.reload(); // Recarga la página para actualizar la lista de archivos
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Ocurrió un error al intentar limpiar los archivos.');
+                    });
+            }
+        }
     </script>
 
 </body>

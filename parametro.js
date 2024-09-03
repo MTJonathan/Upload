@@ -172,3 +172,48 @@ form.addEventListener('submit', (e) => {
     e.preventDefault();
     handleFiles(fileInput.files);
 });
+
+const defaultText = document.querySelector('.default-text');
+const dragText = document.querySelector('.drag-text');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropArea.addEventListener(eventName, preventDefaults, false);
+  document.body.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+  e.preventDefault();
+  e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+  dropArea.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  dropArea.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight(e) {
+  dropArea.classList.add('drag-over');
+  defaultText.style.display = 'none';
+  dragText.style.display = 'block';
+}
+
+function unhighlight(e) {
+  dropArea.classList.remove('drag-over');
+  defaultText.style.display = 'block';
+  dragText.style.display = 'none';
+}
+
+dropArea.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+  const dt = e.dataTransfer;
+  const files = dt.files;
+  handleFiles(files);
+}
+
+function handleFiles(files) {
+  ([...files]).forEach(uploadFile);
+}
