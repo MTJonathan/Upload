@@ -1,0 +1,22 @@
+@media(width <= 900px) {
+    body{
+        width: 100vw;
+        display: flex;
+        justify-content: center;
+    }
+    h1{
+        position: relative;
+        margin: 0 auto;
+        width: 1000px;
+    }
+    .content {
+        min-width: 90% !important ;
+        margin: 0 auto;
+    }
+    .container{
+        display: grid;
+        width: 100%;
+        place-items: center;
+        height: auto;
+    }
+}

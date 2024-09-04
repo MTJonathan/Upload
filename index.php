@@ -50,6 +50,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compartir archivos</title>
     <link rel="stylesheet" href="estilo.css">
+    <link rel="stylesheet" href="responsive.css">
     <link rel="manifest" href="manifest.json">
 </head>
 
