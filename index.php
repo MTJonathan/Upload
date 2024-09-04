@@ -129,7 +129,7 @@ try {
 
 
     <script src="parametro.js"></script>
-
+    <script src="sync-tabs.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
@@ -141,6 +141,20 @@ try {
                     });
             });
         }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(function (registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function (err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // Definir carpetaNombre globalmente para que esté disponible en sync-tabs.js
+        const carpetaNombre = '<?php echo $carpetaNombre; ?>';
+
         document.getElementById('archivo').addEventListener('change', function (e) {
             var file = e.target.files[0];
             uploadFile(file);
