@@ -57,7 +57,7 @@ try {
 <body>
     <h1>Compartir archivos <sup class="beta">BETA</sup></h1>
     <div class="content">
-        <h3>Sube tus archivos y comparte este enlace temporal: <span>ibu.pe/?nombre=<?php echo $carpetaNombre; ?></span>
+        <h3>Sube tus archivos y comparte este enlace temporal: <a href="https://senatinoupload.zeabur.app/?nombre=<?php echo $carpetaNombre; ?>" target="_blank">senatinoupload.zeabur.app/?nombre=<?php echo $carpetaNombre; ?></a>
         </h3>
         <div class="container">
             <div class="drop-area" id="drop-area">
