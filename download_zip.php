@@ -1,10 +1,16 @@
 <?php
-$carpetaNombre = isset($_GET['nombre']) ? $_GET['nombre'] : '';
+// Configuración de errores para desarrollo
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Validación y sanitización del nombre de la carpeta
+$carpetaNombre = isset($_GET['nombre']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['nombre']) : '';
 $carpetaRuta = "./descarga/" . $carpetaNombre;
 
-// Verifica si la carpeta existe
-if (!file_exists($carpetaRuta)) {
-    die("La carpeta no existe.");
+// Verifica si la carpeta existe y es un directorio válido
+if (!file_exists($carpetaRuta) || !is_dir($carpetaRuta)) {
+    die("La carpeta no existe o no es un directorio válido.");
 }
 
 $zipname = $carpetaNombre . '.zip';
@@ -12,6 +18,10 @@ $zipname = $carpetaNombre . '.zip';
 // Crea un archivo temporal
 $temp_file = tempnam(sys_get_temp_dir(), 'zip');
 $zip = fopen($temp_file, 'w');
+
+if ($zip === false) {
+    die("No se pudo crear el archivo temporal.");
+}
 
 // Función recursiva para añadir archivos al ZIP
 function addFilesToZip($zip, $dir, $zipdir = '') {
@@ -24,7 +34,13 @@ function addFilesToZip($zip, $dir, $zipdir = '') {
                     addFilesToZip($zip, $file, $zipfile);
                 } else {
                     $content = file_get_contents($file);
+                    if ($content === false) {
+                        continue; // Skip this file if it can't be read
+                    }
                     $zip_content_start = ftell($zip);
+                    if ($zip_content_start === false) {
+                        die("Error al obtener la posición del puntero del archivo.");
+                    }
 
                     fwrite($zip, "\x50\x4b\x03\x04");
                     fwrite($zip, pack('v', 10)); 
@@ -56,6 +72,9 @@ addFilesToZip($zip, $carpetaRuta);
 
 // Central directory
 $central_dir_start = ftell($zip);
+if ($central_dir_start === false) {
+    die("Error al obtener la posición del puntero del archivo para el directorio central.");
+}
 $central_dir = '';
 $entries = 0;
 
@@ -65,6 +84,9 @@ if ($handle = opendir($carpetaRuta)) {
             $file = $carpetaRuta . '/' . $entry;
             if (!is_dir($file)) {
                 $content = file_get_contents($file);
+                if ($content === false) {
+                    continue; // Skip this file if it can't be read
+                }
                 $central_dir .= "\x50\x4b\x01\x02";
                 $central_dir .= pack('v', 10); 
                 $central_dir .= pack('v', 10); 

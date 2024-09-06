@@ -1,10 +1,16 @@
 <?php
-$carpetaNombre = isset($_GET['nombre']) ? $_GET['nombre'] : '';
+$carpetaNombre = isset($_GET['nombre']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['nombre']) : '';
 $carpetaRuta = "./descarga/" . $carpetaNombre;
 
 try {
+    if (!$carpetaNombre) {
+        throw new Exception("Nombre de carpeta no especificado o inválido.");
+    }
+
     if (!file_exists($carpetaRuta)) {
-        mkdir($carpetaRuta, 0755, true);
+        if (!mkdir($carpetaRuta, 0755, true)) {
+            throw new Exception("Error al crear la carpeta '$carpetaNombre'.");
+        }
         $mensaje = "Carpeta '$carpetaNombre' creada con éxito.";
     } else {
         $mensaje = "La carpeta '$carpetaNombre' ya existe.";
@@ -13,33 +19,34 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['archivo'])) {
             $archivo = $_FILES['archivo'];
+            $archivoNombre = basename($archivo['name']);
+            $archivoRuta = $carpetaRuta . '/' . $archivoNombre;
 
-            if (move_uploaded_file($archivo['tmp_name'], $carpetaRuta . '/' . $archivo['name'])) {
-                $subido = true;
-                $mensaje = "Archivo subido con éxito.";
-            } else {
+            if (!move_uploaded_file($archivo['tmp_name'], $archivoRuta)) {
                 throw new Exception("Error al subir el archivo.");
             }
+            $mensaje = "Archivo subido con éxito.";
         }
-    }
 
-    if (isset($_POST['eliminarArchivo'])) {
-        $archivoAEliminar = $_POST['eliminarArchivo'];
-        $archivoRutaAEliminar = $carpetaRuta . '/' . $archivoAEliminar;
+        if (isset($_POST['eliminarArchivo'])) {
+            $archivoAEliminar = basename($_POST['eliminarArchivo']);
+            $archivoRutaAEliminar = $carpetaRuta . '/' . $archivoAEliminar;
 
-        if (file_exists($archivoRutaAEliminar)) {
-            if (unlink($archivoRutaAEliminar)) {
-                $mensaje = "Archivo '$archivoAEliminar' eliminado con éxito.";
-            } else {
+            if (!file_exists($archivoRutaAEliminar)) {
+                throw new Exception("El archivo '$archivoAEliminar' no existe.");
+            }
+
+            if (!unlink($archivoRutaAEliminar)) {
                 throw new Exception("Error al eliminar el archivo.");
             }
-        } else {
-            throw new Exception("El archivo '$archivoAEliminar' no existe.");
+            $mensaje = "Archivo '$archivoAEliminar' eliminado con éxito.";
         }
     }
 } catch (Exception $e) {
     $mensaje = "Error: " . htmlspecialchars($e->getMessage());
 }
+
+// Rest of the HTML remains the same
 ?>
 
 <!DOCTYPE html>
@@ -57,7 +64,9 @@ try {
 <body>
     <h1>Compartir archivos <sup class="beta">BETA</sup></h1>
     <div class="content">
-        <h3>Sube tus archivos y comparte este enlace temporal: <a href="https://senatinoupload.zeabur.app/?nombre=<?php echo $carpetaNombre; ?>" target="_blank">senatinoupload.zeabur.app/?nombre=<?php echo $carpetaNombre; ?></a>
+        <h3>Sube tus archivos y comparte este enlace temporal: <a
+                href="http://senatinomt.online/?nombre=<?php echo $carpetaNombre; ?>"
+                target="_blank">senatinomt.online/?nombre=<?php echo $carpetaNombre; ?></a>
         </h3>
         <div class="container">
             <div class="drop-area" id="drop-area">
@@ -79,6 +88,7 @@ try {
                     <progress id="progress-bar" value="0" max="100" style="width: 100%;"></progress>
                     <p id="progress-status"></p>
                 </div>
+
             </div>
 
             <div class="container2">
@@ -131,62 +141,63 @@ try {
     <script src="parametro.js"></script>
     <script src="sync-tabs.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function () {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(function (registration) {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    }, function (err) {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function () {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(function (registration) {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    }, function (err) {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
-            });
-        }
-
-        // Definir carpetaNombre globalmente para que esté disponible en sync-tabs.js
-        const carpetaNombre = '<?php echo $carpetaNombre; ?>';
-
         document.getElementById('archivo').addEventListener('change', function (e) {
-            var file = e.target.files[0];
-            uploadFile(file);
+            var files = e.target.files; // Manejar múltiples archivos
+            uploadFiles(files); // Llama a la función para manejar varios archivos
         });
 
-        function uploadFile(file) {
+        function uploadFiles(files) {
+            const totalFiles = files.length;
+            let uploadedFiles = 0;
+            let totalBytes = 0;
+            let loadedBytes = 0;
+
+            // Calcular el tamaño total de los archivos
+            for (let i = 0; i < totalFiles; i++) {
+                totalBytes += files[i].size;
+            }
+
+            // Mostrar el contenedor de progreso
+            document.getElementById('progress-container').style.display = 'block';
+
+            for (let i = 0; i < totalFiles; i++) {
+                uploadSingleFile(files[i], function (e) {
+                    // Actualizar el progreso total de los archivos
+                    loadedBytes += e.loaded;
+                    var percentComplete = (loadedBytes / totalBytes) * 100;
+                    document.getElementById('progress-bar').value = percentComplete;
+                    document.getElementById('progress-status').textContent = Math.round(percentComplete) + '% subido';
+
+                    // Si todos los archivos se han subido, recarga la página
+                    if (i === totalFiles - 1 && e.loaded === e.total) {
+                        document.getElementById('progress-status').textContent = 'Todos los archivos subidos con éxito';
+                        location.reload(); // Recargar la página para mostrar los nuevos archivos
+                    }
+                });
+            }
+        }
+
+        function uploadSingleFile(file, onProgressCallback) {
             var xhr = new XMLHttpRequest();
             var formData = new FormData();
             formData.append('archivo', file);
 
             xhr.open('POST', 'subir.php?nombre=<?php echo $carpetaNombre; ?>', true);
 
-            xhr.upload.onprogress = function (e) {
-                if (e.lengthComputable) {
-                    var percentComplete = (e.loaded / e.total) * 100;
-                    document.getElementById('progress-bar').value = percentComplete;
-                    document.getElementById('progress-status').textContent = Math.round(percentComplete) + '% subido';
-                }
-            };
+            xhr.upload.onprogress = onProgressCallback;
 
             xhr.onload = function () {
                 if (xhr.status === 200) {
-                    document.getElementById('progress-status').textContent = 'Archivo subido con éxito';
-                    location.reload(); // Recarga la página para mostrar el nuevo archivo
+                    // Subida exitosa
+                    console.log('Archivo subido con éxito:', file.name);
                 } else {
-                    document.getElementById('progress-status').textContent = 'Error al subir el archivo';
+                    document.getElementById('progress-status').textContent = 'Error al subir el archivo: ' + file.name;
                 }
             };
 
-            document.getElementById('progress-container').style.display = 'block';
             xhr.send(formData);
         }
+
         function cleanAllFiles() {
             if (confirm('¿Estás seguro de que quieres eliminar todos los archivos?')) {
                 fetch('clean_files.php?nombre=<?php echo $carpetaNombre; ?>', {
@@ -208,6 +219,7 @@ try {
             }
         }
     </script>
+
 
 </body>
 
